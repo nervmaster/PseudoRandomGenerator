@@ -1,11 +1,16 @@
 ;; 2^32 = 4294967296
-;; M = 4294967292 (2^32 - 4)
-;; C = 19998721 (Coprime of M)
+;; M = 4294967295 (2^32)
+;; C = 2147488179 (Coprime of M)
 ;; A = 1431655765 (A-1 Shares prime-factors of M and also 4)
 
-(defun pseudo-random (seed)
+
+(defun get-magic-number ()
+	(+ 1 1))
+
+(defvar *state-of-rng* (get-magic-number))
+
+(defun pseudo-random ( &optional (seed *state-of-rng*))
 	"Linear congruentional generator"
-	(let ((a 1431655765) (c 19998721) (m 4294967292) (x seed))
-		(loop for i from 0 to (rem (+ (* x a) c) m)
-			do (setf x (rem (+ (* x a) c) m))
-		(return-from pseudo-random x))))
+	(let ((a 154641) (c 10071) (m 4294967295) (x seed))
+		(setf *state-of-rng* (rem (+ (* x a) c) m))))
+	
