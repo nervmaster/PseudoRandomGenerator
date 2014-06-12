@@ -1,11 +1,9 @@
-;; 2^32 = 4294967296
-;; M = 4294967295 (2^32)
-;; C = 2147488179 (Coprime of M)
-;; A = 1431655765 (A-1 Shares prime-factors of M and also 4)
-
+;; Well with the impossibility to choose an a-1 that would share all prime factors of (- (expt 2 32) 1) I choose the arguments at random
+;; The range is not so great. But puting the result enclosed with a remainder of 100 it got fairly good randomness (Need still to be tested)
+;; Need to make a function to get a number by the machine's time
 
 (defun get-magic-number ()
-	(+ 1 1))
+	(rem (get-universal-time) (expt 2 16))) ;;No special reason at all
 
 (defvar *state-of-rng* (get-magic-number))
 
