@@ -2,13 +2,27 @@
 ;; The range is not so great. But puting the result enclosed with a remainder of 100 it got fairly good randomness (Need still to be tested)
 ;; Need to make a function to get a number by the machine's time
 
+
+
+
 (defun get-magic-number ()
 	(rem (get-universal-time) (expt 2 16))) ;;No special reason at all
 
-(defvar *state-of-rng* (get-magic-number))
+(defclass rng-state ()
+	;;"Class that defines the actual state of the lcg"
+	((a :accessor a-value
+		:initarg :a)
+	 (c :accessor c-value
+	 	:initarg :c)
+	 (m :accessor m-value
+	 	:initarg :m)
+	 (seed :accessor seed-value
+	 	:initarg :seed)))
 
-(defun pseudo-random ( &optional (seed *state-of-rng*))
+(defparameter *state-of-rng* (make-instance 'rng-state :a 154641 :c 10071 :m (- (expt 2 32) 1) :seed (get-magic-number)))
+
+(defun pseudo-random ( &optional (state *state-of-rng*))
 	"Linear congruentional generator"
-	(let ((a 154641) (c 10071) (m 4294967295) (x seed))
-		(setf *state-of-rng* (rem (+ (* x a) c) m))))
+		(setf (seed-value state) 
+			(rem (+	(* (seed-value state) (a-value state)) (c-value state))	(m-value state)))) ;; x = (ax + c) mod m
 	
