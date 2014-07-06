@@ -7,6 +7,8 @@
 (load-shared-object "libtestu01.so.0")
 
 (load "linear.cl") ;;load my algorithm
+(load "MersenneTwister.cl")
+(initialize-generator 1234567980)
 
 (define-alien-routine ("unif01_CreateExternGenBits" unif01:create-extern-genbits)
     (* t)
@@ -18,13 +20,13 @@
 
 
 (sb-alien::define-alien-callback mt-genb unsigned-int ()
-  (pseudo-random))
+  (extract-number))
 
 (define-alien-routine ("bbattery_SmallCrush" bbattery:small-crush)
     void
   (gen (* t)))
 
-(let ((genb (unif01:create-extern-genbits "PSEUDO_RANDOM" mt-genb)))
+(let ((genb (unif01:create-extern-genbits "MERSENNE_TWISTER" mt-genb)))
   (bbattery:small-crush genb)
   (unif01:delete-extern-genbits genb))
 
