@@ -1,6 +1,6 @@
 ;;function to write the random numbers on a text file for dieharder
 
-(defun rng-to-file (:rng rng :name name :seed seed)
+(defun rng-to-file (rng name seed)
 	(with-open-file (out "rngtofile.txt" :direction :output :if-exists :supersede)
 		(format out "#==============================================~%")
 		(format out "# generator ~a seed = ~a~%" name seed)
