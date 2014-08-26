@@ -10,15 +10,19 @@
 (defclass rng-state ()
 	;;"Class that defines the actual state of the lcg"
 	((a :accessor a-value
-		:initarg :a)
+		:initarg :a
+		:initform 268435457)
 	 (c :accessor c-value
-	 	:initarg :c)
+	 	:initarg :c
+	 	:initform 66201)
 	 (m :accessor m-value
-	 	:initarg :m)
+	 	:initarg :m
+	 	:initform (expt 2 31))
 	 (seed :accessor seed-value
-	 	:initarg :seed)))
+	 	:initarg :seed
+	 	:initform (get-magic-number))))
 
-(defparameter *state-of-rng* (make-instance 'rng-state :a 268435457 :c 66201 :m (expt 2 31) :seed (get-magic-number)))
+(defparameter *state-of-rng* (make-instance 'rng-state))
 
 (defun pseudo-random ( &optional (state *state-of-rng*))
 	"Linear congruentional generator"

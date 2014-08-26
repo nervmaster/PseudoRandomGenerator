@@ -18,28 +18,28 @@
 (defparameter *st-isaac* (make-instance 'isaac-state))
 (defparameter *ub4* #xFFFFFFFF)
 
-(defun isaac ()
+(defun isaac (&optional (state *st-isaac*))
 	(let (x y)
-		(setf (cc *st-isaac*) (+ (cc *st-isaac*) 1))
-		(setf (bb *st-isaac*) (+ (cc *st-isaac*) (bb *st-isaac*)))
+		(setf (cc state) (+ (cc state) 1))
+		(setf (bb state) (+ (cc state) (bb state)))
 		(loop for i from 0 to 255
-			do (setf x (nth i (mm *st-isaac*)))
-			do (setf (aa *st-isaac*)
+			do (setf x (nth i (mm state)))
+			do (setf (aa state)
 					(logand *ub4* (logxor 
-						(aa *st-isaac*)
+						(aa state)
 						(case (rem i 4)
-							(0 (ash (aa *st-isaac*) 13))
-							(1 (ash (aa *st-isaac*) -6))
-							(2 (ash (aa *st-isaac*) 2))
-							(3 (ash (aa *st-isaac*) 16))))))
-			do (setf (aa *st-isaac*)
-					(logand *ub4* (+ (nth (rem (+ i 128) 256) (mm *st-isaac*)) (aa *st-isaac*))))
-			do (setf (nth i (mm *st-isaac*))
+							(0 (ash (aa state) 13))
+							(1 (ash (aa state) -6))
+							(2 (ash (aa state) 2))
+							(3 (ash (aa state) 16))))))
+			do (setf (aa state)
+					(logand *ub4* (+ (nth (rem (+ i 128) 256) (mm state)) (aa state))))
+			do (setf (nth i (mm state))
 					(setf y
-						(logand *ub4* (+ (nth (rem (ash x -2) 256) (mm *st-isaac*)) (aa *st-isaac*) (bb *st-isaac*)))))
-			do (setf (nth i (randrsl *st-isaac*))
-					(setf (bb *st-isaac*)
-						(logand *ub4* (+ (nth (rem (ash y -10) 256) (mm *st-isaac*)) x)))))))
+						(logand *ub4* (+ (nth (rem (ash x -2) 256) (mm state)) (aa state) (bb state)))))
+			do (setf (nth i (randrsl state))
+					(setf (bb state)
+						(logand *ub4* (+ (nth (rem (ash y -10) 256) (mm state)) x)))))))
 
 (defun mix (a b c d e f g h)
 	(setf a (logxor a (ash b 11)))   (setf d (+ d a)) (setf b (+ b c))
@@ -56,49 +56,49 @@
 
 
 
-(defun rand-init (flag)
+(defun rand-init (flag &optional (state *st-isaac*))
 	(let (a b c d e f g h)
-		(setf (aa *st-isaac*) (setf (bb *st-isaac*)	(setf (cc *st-isaac*) 0)))
+		(setf (aa state) (setf (bb state)	(setf (cc state) 0)))
 		(setf a (setf b (setf c (setf d (setf e (setf f (setf g (setf h #x9e3779b9))))))))
 		(loop for i from 1 to 3
 			do (mix a b c d e f g h))
 		(loop for i from 0 to 255 by 8
 			do (if (> flag 0)
 					(progn
-						(setf a (+ a (nth (+ i 0) (randrsl *st-isaac*)))) (setf b (+ b (nth (+ i 1) (randrsl *st-isaac*))))
-					 	(setf c (+ c (nth (+ i 2) (randrsl *st-isaac*)))) (setf d (+ d (nth (+ i 3) (randrsl *st-isaac*))))
-					 	(setf e (+ e (nth (+ i 4) (randrsl *st-isaac*)))) (setf f (+ f (nth (+ i 5) (randrsl *st-isaac*))))
-					 	(setf g (+ g (nth (+ i 6) (randrsl *st-isaac*)))) (setf h (+ h (nth (+ i 7) (randrsl *st-isaac*))))))
+						(setf a (+ a (nth (+ i 0) (randrsl state)))) (setf b (+ b (nth (+ i 1) (randrsl state))))
+					 	(setf c (+ c (nth (+ i 2) (randrsl state)))) (setf d (+ d (nth (+ i 3) (randrsl state))))
+					 	(setf e (+ e (nth (+ i 4) (randrsl state)))) (setf f (+ f (nth (+ i 5) (randrsl state))))
+					 	(setf g (+ g (nth (+ i 6) (randrsl state)))) (setf h (+ h (nth (+ i 7) (randrsl state))))))
 			do (mix a b c d e f g h)
-			do (setf (nth (+ i 0) (mm *st-isaac*)) a) do (setf (nth (+ i 1) (mm *st-isaac*)) b)
-			do (setf (nth (+ i 2) (mm *st-isaac*)) c) do (setf (nth (+ i 3) (mm *st-isaac*)) d)
-			do (setf (nth (+ i 4) (mm *st-isaac*)) e) do (setf (nth (+ i 5) (mm *st-isaac*)) f)
-			do (setf (nth (+ i 6) (mm *st-isaac*)) g) do (setf (nth (+ i 7) (mm *st-isaac*)) h))
+			do (setf (nth (+ i 0) (mm state)) a) do (setf (nth (+ i 1) (mm state)) b)
+			do (setf (nth (+ i 2) (mm state)) c) do (setf (nth (+ i 3) (mm state)) d)
+			do (setf (nth (+ i 4) (mm state)) e) do (setf (nth (+ i 5) (mm state)) f)
+			do (setf (nth (+ i 6) (mm state)) g) do (setf (nth (+ i 7) (mm state)) h))
 		(if (> flag 0)
 			(loop for i from 0 to 255 by 8
-				do (setf a (+ a (nth (+ i 0) (randrsl *st-isaac*)))) do (setf b (+ b (nth (+ i 1) (randrsl *st-isaac*))))
-				do (setf c (+ c (nth (+ i 2) (randrsl *st-isaac*)))) do (setf d (+ d (nth (+ i 3) (randrsl *st-isaac*))))
-				do (setf e (+ e (nth (+ i 4) (randrsl *st-isaac*)))) do (setf f (+ f (nth (+ i 5) (randrsl *st-isaac*))))
-				do (setf g (+ g (nth (+ i 6) (randrsl *st-isaac*)))) do (setf h (+ h (nth (+ i 7) (randrsl *st-isaac*))))
+				do (setf a (+ a (nth (+ i 0) (randrsl state)))) do (setf b (+ b (nth (+ i 1) (randrsl state))))
+				do (setf c (+ c (nth (+ i 2) (randrsl state)))) do (setf d (+ d (nth (+ i 3) (randrsl state))))
+				do (setf e (+ e (nth (+ i 4) (randrsl state)))) do (setf f (+ f (nth (+ i 5) (randrsl state))))
+				do (setf g (+ g (nth (+ i 6) (randrsl state)))) do (setf h (+ h (nth (+ i 7) (randrsl state))))
 				do (mix a b c d e f g h)
-				do (setf (nth (+ i 0) (mm *st-isaac*)) a) do (setf (nth (+ i 1) (mm *st-isaac*)) b)
-				do (setf (nth (+ i 2) (mm *st-isaac*)) c) do (setf (nth (+ i 3) (mm *st-isaac*)) d)
-				do (setf (nth (+ i 4) (mm *st-isaac*)) e) do (setf (nth (+ i 5) (mm *st-isaac*)) f)
-				do (setf (nth (+ i 6) (mm *st-isaac*)) g) do (setf (nth (+ i 7) (mm *st-isaac*)) h)))
-		(isaac)
-		(setf (randcnt *st-isaac*) 256)))
+				do (setf (nth (+ i 0) (mm state)) a) do (setf (nth (+ i 1) (mm state)) b)
+				do (setf (nth (+ i 2) (mm state)) c) do (setf (nth (+ i 3) (mm state)) d)
+				do (setf (nth (+ i 4) (mm state)) e) do (setf (nth (+ i 5) (mm state)) f)
+				do (setf (nth (+ i 6) (mm state)) g) do (setf (nth (+ i 7) (mm state)) h)))
+		(isaac state)
+		(setf (randcnt state) 256)))
 
-(defun main-motor ()
-	(if (= (randcnt *st-isaac*) -1)   			;;first execution ever
+(defun main-motor (&optional (state *st-isaac*))
+	(if (= (randcnt state) -1)   			;;first execution ever
 		(progn
-			(rand-init 1)
-			(setf (randcnt *st-isaac*) 0)))
-	(if (= (randcnt *st-isaac*) 255)			;;check if reached final of algorithm
-		(setf (randcnt *st-isaac*) 0))
-	(if (= (randcnt *st-isaac*) 0)				;;New values generated
-		(isaac))
-	(setf (randcnt *st-isaac*) (+ (randcnt *st-isaac*) 1))
-	(return-from main-motor (nth (randcnt *st-isaac*) (randrsl *st-isaac*))))
+			(rand-init 1 state)
+			(setf (randcnt state) 0)))
+	(if (= (randcnt state) 255)			;;check if reached final of algorithm
+		(setf (randcnt state) 0))
+	(if (= (randcnt state) 0)				;;New values generated
+		(isaac state))
+	(setf (randcnt state) (+ (randcnt state) 1))
+	(return-from main-motor (nth (randcnt state) (randrsl state))))
 
 
 
