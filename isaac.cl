@@ -1,5 +1,10 @@
 ;; Fully translated from the file readable.c from http://www.burtleburtle.net/bob/rand/isaacafa.html
 
+(defpackage :com.randomnumbergenerator.isaac32
+	(:use :common-lisp)
+	(:export :main-motor :isaac-state))
+
+(in-package :com.randomnumbergenerator.isaac32)
 
 (defclass isaac-state ()
 	((randrsl :accessor randrsl

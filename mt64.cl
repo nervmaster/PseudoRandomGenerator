@@ -2,6 +2,11 @@
 ;; Will try to compare with the actual lisp algorithm on common lisp
 ;; Implementing a 64bit version
 
+(defpackage :com.randomnumbergenerator.mt64
+	(:use :common-lisp)
+	(:export :extract-number64 :mt-state))
+
+(in-package :com.randomnumbergenerator.mt64)
 
 (defclass mt-state ()
 	((mt :accessor mt-vector

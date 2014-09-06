@@ -3,6 +3,11 @@
 ;;C = 66201 (Coprime of m)
 ;;A = 268435457 (A-1 shares all prime factors of m and is also multiple of 4)
 
+(defpackage :com.randomnumbergenerator.lcg32
+	(:use common-lisp)
+	(:export :pseudo-random :rng-state))
+
+(in-package :com.randomnumbergenerator.lcg32)
 
 (defun get-magic-number ()
 	(rem (get-universal-time) (expt 2 16))) ;;No special reason at all
@@ -28,4 +33,4 @@
 	"Linear congruentional generator"
 		(setf (seed-value state) 
 			(rem (+	(* (seed-value state) (a-value state)) (c-value state))	(m-value state)))) ;; x = (ax + c) mod m
-	
+
